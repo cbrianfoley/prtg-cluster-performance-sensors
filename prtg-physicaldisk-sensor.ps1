@@ -1,6 +1,6 @@
 ﻿<#
 prtg-physicaldisk-sensor.ps1
-Powershell script to return cluster disk health in PRTG format
+Powershell script to return cluster node disk health in PRTG format
 
 .USAGE
  1. Update this script and put a copy for each StorageHost in the PRTG Network Monitor\Custom Sensors\EXEXML folder.

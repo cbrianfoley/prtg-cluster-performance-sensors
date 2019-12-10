@@ -1,6 +1,6 @@
 ﻿<#
 prtg-storagejobstatus-sensor.ps1
-Powershell script to return cluster disk health in PRTG format
+Powershell script to return storage job status in PRTG format
 
 .USAGE
  1. Update this script and put a copy for each StorageJobHost in the PRTG Network Monitor\Custom Sensors\EXEXML folder.

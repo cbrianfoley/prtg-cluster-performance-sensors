@@ -5,7 +5,7 @@ Powershell script to return storage pool health status in PRTG format
 .USAGE
  1. Update this script and put a copy for each StorageHost in the PRTG Network Monitor\Custom Sensors\EXEXML folder.
 
-        Set StoragePool to the hostname of one of the cluster storage servers 
+        Set StorageHost to the hostname of one of the cluster storage servers 
 
  2.	Add an EXE Advanced sensor in PRTG
 	    Be sure to select the correct script under Sensor Settings -> Exe/Script
@@ -15,15 +15,15 @@ Powershell script to return storage pool health status in PRTG format
 
 # -----------------------
 
-$StoragePool = 'StorageHost01' # EDIT THIS LINE
+$StorageHost = 'StorageHost01' # EDIT THIS LINE
 
 # -----------------------
 
-$Pool = Get-StoragePool -FriendlyName "S2D*" -CimSession $StoragePool
+$StoragePool = Get-StoragePool -FriendlyName "S2D*" -CimSession $StorageHost
 
 $xmlstring = "<?xml version=`"1.0`"?>`n    <prtg>`n"
 
-ForEach ($pool IN $Pool) {
+ForEach ($pool IN $StoragePool) {
 
 $xmlstring += "        <result>`n"
 $xmlstring += "        <channel>Health of $($pool.FriendlyName) (0 means Healthy)</channel>`n"
