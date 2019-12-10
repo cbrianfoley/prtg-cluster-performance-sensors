@@ -46,7 +46,7 @@ $ClusterNodes = (Get-Cluster -Name $ClusterName | Get-ClusterNode)
 $xmlstring = "<?xml version=`"1.0`"?>`n"
 $xmlstring += "    <prtg>`n"
 
-# this does ask each node in the cluster for performance statistics, even though they all will report the same value. You could remove the for-loop and just ask a single node for a potential performance benefit
+# this does ask each node in the cluster for performance statistics, even though they all will report the same value. You could remove the for-loop and just ask a single node for a performance benefit
 ForEach ($node IN $ClusterNodes) {
 
     $PerfHistory = Invoke-Command -ComputerName $node -ScriptBlock {Get-Clusterperformancehistory} | Select MetricID,Value | 
