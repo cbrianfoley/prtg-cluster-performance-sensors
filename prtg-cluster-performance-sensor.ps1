@@ -1,4 +1,8 @@
 ﻿<#
+
+prtg-cluster-performance-sensor.ps1
+Note this will only work if your storage servers are Server 2019 (Get-Clusterperformancehistory is used)
+
 .USAGE
 Steps
 1.	Install Hyper-V tools and failover clustering features on the probe server if it isn’t already (elevated powershell command): 
@@ -19,9 +23,9 @@ Steps
 
         Set ClusterName to the name of your cluster to be monitored 
 
-5.  Due to how PRTG behaves, it can only call the 32 bit version of powershell, so we have to cheat/wrapper. Create a new .ps1 script with only one line
+5.  Due to how PRTG behaves, it can only call the 32 bit version of powershell, so we have to cheat/wrapper. Create a new .ps1 script with only one line that will call this script
         
-        C:\windows\sysnative\windowspowershell\v1.0\powershell.exe -file "C:\Program Files (x86)\PRTG Network Monitor\Custom Sensors\EXEXML\<thispowershellscript>.ps1"
+        C:\windows\sysnative\windowspowershell\v1.0\powershell.exe -file "C:\Program Files (x86)\PRTG Network Monitor\Custom Sensors\EXEXML\prtg-cluster-performance-sensor.ps1"
 
 6.	Add a custom EXE Advanced sensor in PRTG
         Be sure to select the correct script under Sensor Settings -> Exe/Script (we are selecting the wrapper one-liner)
@@ -45,7 +49,7 @@ $xmlstring += "    <prtg>`n"
 # this does ask each node in the cluster for performance statistics, even though they all will report the same value. You could remove the for-loop and just ask a single node for a potential performance benefit
 ForEach ($node IN $ClusterNodes) {
 
-    $PerfHistory = Invoke-Command -ComputerName $node -ScriptBlock {get-clusterperformancehistory} | Select MetricID,Value | 
+    $PerfHistory = Invoke-Command -ComputerName $node -ScriptBlock {Get-Clusterperformancehistory} | Select MetricID,Value | 
         Where {($_.MetricId -match "Volume.IOPS") -or ($_.MetricId -match "Volume.Latency")}
 
     ForEach ($metric in $PerfHistory) {
