@@ -38,6 +38,7 @@ Steps
 $ClusterName = "Cluster01-19" # EDIT THIS LINE
 
 # -----------------------
+
 Import-Module FailoverClusters
 
 $ClusterNodes = (Get-Cluster -Name $ClusterName | Get-ClusterNode)
@@ -46,21 +47,29 @@ $ClusterNodes = (Get-Cluster -Name $ClusterName | Get-ClusterNode)
 $xmlstring = "<?xml version=`"1.0`"?>`n"
 $xmlstring += "    <prtg>`n"
 
-# this does ask each node in the cluster for performance statistics, even though they all will report the same value. You could remove the for-loop and just ask a single node for a performance benefit
-ForEach ($node IN $ClusterNodes) {
-
-    $PerfHistory = Invoke-Command -ComputerName $node -ScriptBlock {Get-Clusterperformancehistory} | Select MetricID,Value | 
-        Where {($_.MetricId -match "Volume.IOPS") -or ($_.MetricId -match "Volume.Latency")}
+ForEach ($node IN $ClusterNodes[0]) {   # goofy, I know - but this section was copied from another script of mine and I didn't want to change it, to keep this script more similar to that one. 
+                                        # All nodes will report the same Get-ClusterPerf, so we only need to ask one. In this case we're running Get-ClusterPerf on the node at index 0.
+    $PerfHistory = Invoke-Command -ComputerName $node -ScriptBlock {Get-ClusterPerf | 
+    Where {($_.MetricId -match "Volume.IOPS") -or ($_.MetricId -match "Volume.Latency")}}        
 
     ForEach ($metric in $PerfHistory) {
         $xmlstring += "    <result>`n"
         $xmlstring += "        <channel>$($metric.MetricID)</channel>`n"
         $xmlstring += "        <unit>Custom</unit>`n"
+        $xmlstring += "        <CustomUnit>$(if($metric.MetricID -match 'Volume.Latency'){ #if statement to use us for latency and /s for iops
+            'us'
+            }else{
+            '/s'
+            })</CustomUnit>`n"
         $xmlstring += "        <mode>Absolute</mode>`n"
         $xmlstring += "        <showChart>1</showChart>`n"
         $xmlstring += "        <showTable>1</showTable>`n"
         $xmlstring += "        <float>1</float>`n"
-        $xmlstring += "        <value>$($metric.Value)</value>`n"
+        $xmlstring += "        <value>$(if($metric.MetricID -match 'Volume.Latency'){ # if statement to calculate latency in us, and round to 2 sig figs
+            [math]::Round(($metric.Value*10000),2)
+            }else{
+            [math]::Round($metric.Value,2)
+            })</value>`n"
         $xmlstring += "        <LimitMode>1</LimitMode>`n"
         $xmlstring += "    </result>`n"
     }
