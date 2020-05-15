@@ -56,8 +56,8 @@ ForEach ($node IN $ClusterNodes[0]) {   # goofy, I know - but this section was c
         $xmlstring += "    <result>`n"
         $xmlstring += "        <channel>$($metric.MetricID)</channel>`n"
         $xmlstring += "        <unit>Custom</unit>`n"
-        $xmlstring += "        <CustomUnit>$(if($metric.MetricID -match 'Volume.Latency'){ #if statement to use us for latency and /s for iops
-            'us'
+        $xmlstring += "        <CustomUnit>$(if($metric.MetricID -match 'Volume.Latency'){ #if statement to use ms for latency and /s for iops
+            'ms'
             }else{
             '/s'
             })</CustomUnit>`n"
@@ -65,8 +65,8 @@ ForEach ($node IN $ClusterNodes[0]) {   # goofy, I know - but this section was c
         $xmlstring += "        <showChart>1</showChart>`n"
         $xmlstring += "        <showTable>1</showTable>`n"
         $xmlstring += "        <float>1</float>`n"
-        $xmlstring += "        <value>$(if($metric.MetricID -match 'Volume.Latency'){ # if statement to calculate latency in us, and round to 2 sig figs
-            [math]::Round(($metric.Value*10000),2)
+        $xmlstring += "        <value>$(if($metric.MetricID -match 'Volume.Latency'){ # if statement to calculate latency in ms, and round to 2 sig figs
+            [math]::Round(($metric.Value*1000),2)
             }else{
             [math]::Round($metric.Value,2)
             })</value>`n"
